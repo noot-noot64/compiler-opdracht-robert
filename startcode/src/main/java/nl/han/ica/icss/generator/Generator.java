@@ -8,6 +8,7 @@ public class Generator {
 
 	public String generate(AST ast) {
 		StringBuilder sb = new StringBuilder();
+		// Loop through the root body to process stylerules
 		for (ASTNode child : ast.root.body) {
 			if (child instanceof Stylerule) {
 				sb.append(generateStylerule((Stylerule) child));
@@ -25,6 +26,7 @@ public class Generator {
 		}
 		sb.append(" {\n");
 
+		// Format and append declarations inside the brackets
 		for (ASTNode node : rule.body) {
 			if (node instanceof Declaration) {
 				sb.append("  ");
@@ -44,11 +46,12 @@ public class Generator {
 		return "";
 	}
 
-	// GE01: property: value;
+	// Formats the CSS declarations
 	private String generateDeclaration(Declaration decl) {
 		return decl.property.name + ": " + literalToString(decl.expression) + ";";
 	}
 
+	// Converts literals back to plain CSS strings
 	private String literalToString(Expression expr) {
 		if (expr instanceof PixelLiteral)      return ((PixelLiteral) expr).value + "px";
 		if (expr instanceof PercentageLiteral) return ((PercentageLiteral) expr).value + "%";

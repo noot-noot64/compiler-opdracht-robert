@@ -20,6 +20,7 @@ public class Checker {
         checkStylesheet(ast.root);
     }
 
+    // Main entry point for checking the AST
     private void checkStylesheet(Stylesheet sheet) {
         for (ASTNode child : sheet.body) {
             if (child instanceof VariableAssignment) {
@@ -31,6 +32,7 @@ public class Checker {
     }
 
     private void checkStylerule(Stylerule rule) {
+        // Create new scope block
         variableTypes.push(new HashMap<>());
         checkBody(rule.body);
         variableTypes.pop();
@@ -53,6 +55,7 @@ public class Checker {
         variableTypes.peek().put(va.name.name, type);
     }
 
+    // Validate css property values
     private void checkDeclaration(Declaration decl) {
         ExpressionType type = getType(decl.expression);
         String propertyName = decl.property.name;
@@ -92,6 +95,7 @@ public class Checker {
         }
     }
 
+    // Find the type of expressions and expressions elements
     private ExpressionType getType(Expression expr) {
         if (expr instanceof BoolLiteral)       return ExpressionType.BOOL;
         if (expr instanceof ColorLiteral)      return ExpressionType.COLOR;
@@ -116,6 +120,7 @@ public class Checker {
         return ExpressionType.UNDEFINED;
     }
 
+    // Logic for checking addition and subtraction
     private ExpressionType checkAddSub(Operation op) {
         ExpressionType left  = getType(op.lhs);
         ExpressionType right = getType(op.rhs);
@@ -131,6 +136,7 @@ public class Checker {
         return left;
     }
 
+    // Logic for checking multiplication operations
     private ExpressionType checkMultiply(MultiplyOperation op) {
         ExpressionType left  = getType(op.lhs);
         ExpressionType right = getType(op.rhs);
@@ -146,6 +152,7 @@ public class Checker {
         return (left == ExpressionType.SCALAR) ? right : left;
     }
 
+    // Find variable across scopes
     private ExpressionType lookupVariable(String name) {
         IHANStack<HashMap<String, ExpressionType>> temp = new HANStack<>();
         ExpressionType found = null;
@@ -157,7 +164,7 @@ public class Checker {
                 found = scope.get(name);
             }
         }
-        // Restore stack
+
         while (!temp.isEmpty()) {
             variableTypes.push(temp.pop());
         }
